@@ -1,29 +1,40 @@
-# 13913
+# 2188
 
 import sys
-from collections import deque
-
-def bfs(start, end):
-    q = deque([start])
-    arr = [0] * 100001
-    path = [0] * 100001
-    while q:
-        x = q.popleft()
-        if x == end:
-            print(arr[x])
-            res = str(x)
-            a = x
-            for _ in range(arr[x]):
-                a = path[a]
-                res = str(a) + ' ' + res
-            print(res)
-            return
-        for nx in (x-1, x+1, 2*x):
-            if 0<= nx <= 100000 and arr[nx] == 0:
-                q.append(nx)
-                arr[nx] = arr[x] + 1
-                path[nx] = x # x로부터 왔다는 것을 기록
-
+sys.setrecursionlimit(10**7)
 input = sys.stdin.readline
-start, end = map(int, input().split())
-bfs(start, end)
+
+# 왼쪽 정점수, 오른쪽 정점 수
+n, m = map(int, input().split())
+
+# 왼쪽 정점에서 연결 가능한 오른쪽 정점 번호들
+graph = []
+for i in range(n):
+    tmp = list(map(int, input().split()))
+    graph.append(tmp[1:])
+
+# 선택된 정점 번호
+selected = [-1] * (m + 1)
+
+
+def bimatch(N):                                           
+    if visited[N]:                                        
+        return False                                      
+    visited[N] = True                                     
+                                                          
+    for num in graph[N]:                                   
+        if selected[num] == -1 or bimatch(selected[num]):    
+            selected[num] = N
+            print(N, num)
+            return True  
+    return False               
+
+for i in range(n):            
+    visited = [False] * (n)      
+    bimatch(i)
+
+result = 0               
+for i in range(1, m+1):  
+    if selected[i] >= 0:         
+        result += 1
+print(result)
