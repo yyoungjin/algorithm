@@ -1,40 +1,48 @@
-# 2188
+# 22866
 
 import sys
-sys.setrecursionlimit(10**7)
 input = sys.stdin.readline
 
-# 왼쪽 정점수, 오른쪽 정점 수
-n, m = map(int, input().split())
+n = int(input())
+arr = list(map(int, input().split()))
 
-# 왼쪽 정점에서 연결 가능한 오른쪽 정점 번호들
-graph = []
+left_index = [] # 
+left = [[0, -1000000] for _ in range(n)]
 for i in range(n):
-    tmp = list(map(int, input().split()))
-    graph.append(tmp[1:])
+    if left_index:
+        while left_index:
+            if arr[left_index[-1]] <= arr[i]:
+                left_index.pop()
+            else:
+                break
+        if len(left_index):
+            left[i] = (len(left_index), left_index[-1])
+        left_index.append(i)
+    else:
+        left_index.append(i)
 
-# 선택된 정점 번호
-selected = [-1] * (m + 1)
+right_index = []
+right = [[0, 1000000] for _ in range(n)]
+for i in range(n-1, -1, -1):
+    if right_index:
+        while right_index:
+            if arr[right_index[-1]] <= arr[i]:
+                right_index.pop()
+            else:
+                break
+        if len(right_index):
+            right[i] = (len(right_index), right_index[-1])
+        right_index.append(i)
+    else:
+        right_index.append(i)
 
-
-def bimatch(N):                                           
-    if visited[N]:                                        
-        return False                                      
-    visited[N] = True                                     
-                                                          
-    for num in graph[N]:                                   
-        if selected[num] == -1 or bimatch(selected[num]):    
-            selected[num] = N
-            print(N, num)
-            return True  
-    return False               
-
-for i in range(n):            
-    visited = [False] * (n)      
-    bimatch(i)
-
-result = 0               
-for i in range(1, m+1):  
-    if selected[i] >= 0:         
-        result += 1
-print(result)
+for i in range(n):
+    num = left[i][0]+right[i][0]
+    if num == 0:
+        print(0)
+        continue
+    if (i - left[i][1]) <= (right[i][1]-i):
+        index = left[i][1]
+    else:
+        index = right[i][1]
+    print(num, index + 1)
