@@ -1,48 +1,31 @@
-# 22866
+# 위상 정렬
+from collections import deque
+n, m = map(int, input().split())
+table = [[] for _ in range(n+1)]
+visited = [False] * (n+1)
+arr = [0] * (n+1)
+for _ in range(m):
+    a, b = map(int, input().split())
+    table[a].append(b) # 다음 갈 곳
+    arr[b] += 1 # 내가 실행되는 조건의 수
 
-import sys
-input = sys.stdin.readline
+q = deque([])
+res = []
+# 시작점 찾기
+for i in range(1, n+1):
+    if not arr[i]:
+        q.append(i)
+        visited[i] = True
 
-n = int(input())
-arr = list(map(int, input().split()))
+while q:
+    node = q.popleft()
+    res.append(str(node)) # 결과에 기록
+    # 노드 제거
+    for i in table[node]:
+        arr[i] -= 1
+        if arr[i] == 0:
+            if not visited[i]:
+                q.append(i)
+                visited[i] = True
 
-left_index = [] # 
-left = [[0, -1000000] for _ in range(n)]
-for i in range(n):
-    if left_index:
-        while left_index:
-            if arr[left_index[-1]] <= arr[i]:
-                left_index.pop()
-            else:
-                break
-        if len(left_index):
-            left[i] = (len(left_index), left_index[-1])
-        left_index.append(i)
-    else:
-        left_index.append(i)
-
-right_index = []
-right = [[0, 1000000] for _ in range(n)]
-for i in range(n-1, -1, -1):
-    if right_index:
-        while right_index:
-            if arr[right_index[-1]] <= arr[i]:
-                right_index.pop()
-            else:
-                break
-        if len(right_index):
-            right[i] = (len(right_index), right_index[-1])
-        right_index.append(i)
-    else:
-        right_index.append(i)
-
-for i in range(n):
-    num = left[i][0]+right[i][0]
-    if num == 0:
-        print(0)
-        continue
-    if (i - left[i][1]) <= (right[i][1]-i):
-        index = left[i][1]
-    else:
-        index = right[i][1]
-    print(num, index + 1)
+print(' '.join(res))
