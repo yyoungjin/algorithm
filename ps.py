@@ -1,32 +1,30 @@
-# 위상 정렬
+from collections import deque
 import sys
-import heapq
 input = sys.stdin.readline
 
-n, m = map(int, input().split())
-table = [[] for _ in range(n+1)]
-arr = [0] * (n+1)
+n = int(input())
+indegree = [0] * (n+1)
+graph = [[] for _ in range(n+1)]
+dp = [0] * (n+1)
+t = [0]
 
-for _ in range(m):
-    a, b = map(int, input().split())
-    table[a].append(b)
-    arr[b] += 1
-
-q = []
-res = []
-# 시작점 찾기
 for i in range(1, n+1):
-    if not arr[i]:
-        heapq.heappush(q, i)
-        arr[i] -= 1 # 방문처리
-
+    array = list(map(int, input().split()))
+    t.append(array[0])
+    if array[1] != 0:
+        for j in range(2, len(array)):
+            graph[array[j]].append(i)
+            indegree[i] += 1
+q = deque()
+for i in range(1, n+1):
+    if indegree[i] == 0:
+        q.append(i)
+        dp[i] = t[i]
 while q:
-    node = heapq.heappop(q)
-    res.append(str(node)) # 결과에 기록
-    # 노드 제거
-    for i in table[node]:
-        arr[i] -= 1
-        if not arr[i]:
-            heapq.heappush(q, i)
-
-print(' '.join(res))
+    now = q.popleft()
+    for i in graph[now]:
+        indegree[i] -= 1
+        dp[i] = max(dp[now] + t[i], dp[i])
+        if indegree[i] == 0:
+            q.append(i)
+print(max(dp))
