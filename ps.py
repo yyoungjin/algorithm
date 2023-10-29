@@ -1,50 +1,64 @@
-# 2206
+# 2638
 import sys
-from collections import deque
+input = sys.stdin.readline
+sys.setrecursionlimit(10**7)
 
-n, m = map(int, sys.stdin.readline().split())
-table = []
-dp = [[False] * m for _ in range(n)]
-dp_crack = [[False] * m for _ in range(n)]
+n, m = map(int, input().split())
+table = [list(map(int, input().split())) for _ in range(n)]
+dx = [-1, 1, 0, 0]
+dy = [0, 0, -1, 1]
 
-for _ in range(n):
-    table.append(list(map(int, sys.stdin.readline().rstrip())))
+# 바깥에서 공기를 확산시키고 닿는 면적이 2면 이상인 c를 확보
 
-# 0은 파괴 가능 1은 불가능
-q = deque([(0, 0, 0)])
-dp[0][0] = 1
-while q:
-    x, y, c = q.popleft()
-    if x == n-1 and y == m-1:
-        break
+# 1. 가장자리에서 공기 확산시키기 
+def dfs(x, y):
+    # 확산처리
+    table[x][y] = -1
 
-    if table[x][y]:
-        c = 1
-        dp_crack[x][y] = dp[x][y]
-
-    dx = [-1, 1, 0, 0]
-    dy = [0, 0, -1, 1]
-
+    # 상하좌우로 확산
     for i in range(4):
         nx = dx[i] + x
         ny = dy[i] + y
-        if 0<=nx<n and 0<=ny<m:
-            if not c: # 파괴 가능하다면
-                if not dp[nx][ny]:
-                    dp[nx][ny] = dp[x][y]+1
-                    q.append((nx, ny, c))
+        if 0<=nx<n and 0<=ny<m and table[nx][ny] == 0:
+            dfs(nx, ny)
 
-            elif not dp_crack[nx][ny] and dp_crack[x][y] and c: # 파괴 불가능에 다음이 지나갈 수 있는 길이라면
-                dp_crack[nx][ny] = dp_crack[x][y] + 1
-                q.append((nx, ny, c))
+# 초기 확산
+for j in [0, m-1]:
+    for i in range(n):
+        dfs(i, j)
+for i in [0, n-1]:
+    for j in range(1, m-1):
+        dfs(i, j)
 
-        
+# 2. c 표시
+def c_check():
+    clist = []
+    for i in range(1, n-1):
+        for j in range(1, m-1):
+            if table[i][j] == 1:
+                count = 0
+                for t in range(4):
+                    nx = dx[t] + i
+                    ny = dy[t] + j
+                    if table[nx][ny] == -1:
+                        count += 1
+                if count >= 2:
+                    clist.append([i, j])
+                    table[i][j] = 'c'
+    return clist
 
-if dp[n-1][m-1] and dp_crack[n-1][m-1]:
-    print(min(dp[n-1][m-1], dp_crack[n-1][m-1]))
-elif dp[n-1][m-1]:
-    print(dp[n-1][m-1])
-elif dp_crack[n-1][m-1]:
-    print(dp_crack[n-1][m-1])
-else:
-    print(-1)
+count = 0
+while True:
+    clist = c_check()
+    if not clist:
+        break
+    for i, j in clist:
+        dfs(i, j)
+    count += 1
+
+
+
+# for i in range(n):
+#     print(table[i])
+
+print(count)
