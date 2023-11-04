@@ -1,27 +1,27 @@
-# 11053
+# 19637
 import sys
 input = sys.stdin.readline
-n = int(input())
+
+
+def binary_search(arr, target, start, end):
+    while start <= end:
+        mid = (start + end) // 2
+        res = 0
+        for tree in arr:
+            if tree > mid:
+                res+=(tree-mid)
+
+        if res >= target:
+            result = mid  # mid 값이 일단 저장됨
+            start = mid + 1
+        else:
+            end = mid - 1
+    
+    return result
+
+
+n, m = map(int, input().split())
 arr = list(map(int, input().split()))
 
-dp = [0] * n
-table = [[] for _ in range(n)]
-
-for i in range(n):
-    count = 1
-    tmp = [arr[i]]
-    for j in range(i):
-        if arr[j] < arr[i]:
-            if count < (dp[j]+1):
-                count = dp[j]+1
-                tmp = table[j] + [arr[i]]
-
-
-    dp[i] = count
-    table[i] = tmp
-
-max_value = max(dp)
-max_table = table[dp.index(max_value)]
-
-print(max_value)
-print(' '.join(map(str, max_table)))
+rst = binary_search(arr, m, 0, max(arr))
+print(rst)
