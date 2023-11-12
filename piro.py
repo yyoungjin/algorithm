@@ -1,42 +1,77 @@
-# 2515
-import sys
-input = sys.stdin.readline
+#20191
+from bisect import bisect_left
+# left_t에 해당 알파벳이 있는지 찾는게 우선.
 
-n, s = map(int, input().split())
-heights = []
-prices = {}
-for _ in range(n):
-    h, p = map(int, input().split())
-    if h < s:
-        continue
-    if h in prices:
-        prices[h] = max(prices[h], p)
-    else:
-        prices[h] = p
-        heights.append(h)
 
-heights.sort()
-
-def find_p(x): # 높이가 x 보다 작거나 같은 그림 중 가장 큰 그림의 가격을 찾아라
+#이분탐색
+def b_search(d_i, t_i):
     start = 0
-    end = len(heights)
-    res = 0
-    while start<=end:
+    end = len(dp[d_i]) - 1
+    res = -1
+    while start <= end:
         mid = (start + end) // 2
-        if heights[mid] <= x:
-            res = prices[heights[mid]]
-            start = mid + 1
-        else:
+        if dp[d_i][mid] > t_i:
+            res = mid
             end = mid - 1
-        
+        else:
+            start = mid + 1
+
     return res
 
+# input
+s = list(input())
+t = list(input())
 
-# dp[x]는 dp[x-1]과 dp[x-s]+(높이가 x인 그림가격) 중 큰 값이다.
-for i, l in enumerate(heights): 
-    # l-s 이하 중 가장 큰 그림을 찾는게 핵심
-    if i == 0:
-        continue
-    prices[l] = max(prices[heights[i-1]], find_p(l-s) + prices[l])
+dp = {i:[] for i in "abcdefghijklmnopqrstuvwxyz"}
+for i in range(len(t)):
+    dp[t[i]].append(i)
 
-print(prices[l])
+t_i = 0
+res = 1
+for i, w in enumerate(s):
+    tmp = b_search(w, t_i) 
+    tmp = bisect_left(dp[w], t_i)
+    if tmp < len(dp[w]):
+        t_i = dp[w][tmp]+1
+    else:
+        res += 1
+        t_i = 0
+        tmp = b_search(w, t_i) 
+        if tmp < len(dp[w]):
+            t_i = dp[w][tmp]+1
+        else:
+            print(-1)
+            exit()
+
+print(res)
+
+
+
+
+# import sys
+# input = sys.stdin.readline
+# from bisect import bisect_left
+
+# S = input().strip()
+# T = input().strip()
+
+# s,t = len(S),len(T)
+
+# alphabet = {i:[] for i in "abcdefghijklmnopqrstuvwxyz"}
+# for i in range(t):
+#   alphabet[T[i]].append(i)
+
+# cnt = 1
+# last = 0
+# for letter in S:
+#   if not alphabet[letter]:
+#     cnt = -1
+#     break
+#   idx = bisect_left(alphabet[letter],last)
+#   if idx == len(alphabet[letter]):
+#     cnt += 1
+#     last = 0
+#     idx = bisect_left(alphabet[letter],last)
+#   last = alphabet[letter][idx]+1
+
+# print(cnt)
