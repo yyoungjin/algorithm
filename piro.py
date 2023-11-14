@@ -1,77 +1,26 @@
-#20191
-from bisect import bisect_left
-# left_t에 해당 알파벳이 있는지 찾는게 우선.
+#22871
+import sys
+input = sys.stdin.readline
+INF = 999999999
 
+n = int(input())
+arr = list(map(int, input().split()))
 
-#이분탐색
-def b_search(d_i, t_i):
-    start = 0
-    end = len(dp[d_i]) - 1
-    res = -1
-    while start <= end:
-        mid = (start + end) // 2
-        if dp[d_i][mid] > t_i:
-            res = mid
-            end = mid - 1
-        else:
-            start = mid + 1
+dp = [0] * n # 매 위치마다 k의 최소값을 저장하자
 
-    return res
+# j 위치일 때, 이전 위치들을 전부 돌며 k최소값을 구한다?
+for j in range(1, n):
+    k = INF
+    #O(n)
+    for i in range(j):
+        tmp = (j - i) * (abs(arr[i] - arr[j]) + 1)
+        tmp = max(tmp, dp[i])
+        k = min(k, tmp)
 
-# input
-s = list(input())
-t = list(input())
-
-dp = {i:[] for i in "abcdefghijklmnopqrstuvwxyz"}
-for i in range(len(t)):
-    dp[t[i]].append(i)
-
-t_i = 0
-res = 1
-for i, w in enumerate(s):
-    tmp = b_search(w, t_i) 
-    tmp = bisect_left(dp[w], t_i)
-    if tmp < len(dp[w]):
-        t_i = dp[w][tmp]+1
-    else:
-        res += 1
-        t_i = 0
-        tmp = b_search(w, t_i) 
-        if tmp < len(dp[w]):
-            t_i = dp[w][tmp]+1
-        else:
-            print(-1)
-            exit()
-
-print(res)
+    #O(log(n))
 
 
 
+    dp[j] = k
 
-# import sys
-# input = sys.stdin.readline
-# from bisect import bisect_left
-
-# S = input().strip()
-# T = input().strip()
-
-# s,t = len(S),len(T)
-
-# alphabet = {i:[] for i in "abcdefghijklmnopqrstuvwxyz"}
-# for i in range(t):
-#   alphabet[T[i]].append(i)
-
-# cnt = 1
-# last = 0
-# for letter in S:
-#   if not alphabet[letter]:
-#     cnt = -1
-#     break
-#   idx = bisect_left(alphabet[letter],last)
-#   if idx == len(alphabet[letter]):
-#     cnt += 1
-#     last = 0
-#     idx = bisect_left(alphabet[letter],last)
-#   last = alphabet[letter][idx]+1
-
-# print(cnt)
+print(dp[-1])
