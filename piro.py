@@ -1,59 +1,43 @@
-# 16724
 import sys
 sys.setrecursionlimit(10**7)
+input = sys.stdin.readline
 
+# matched_Y : Y 그룹의 노드와 매칭된 X 노드의 번호
+# matched_X : X 그룹의 노드와 매칭된 Y 노드의 번호
+def dfs(x):
+    visited[x] = True
+    for y in graph[x]:
+        # y 노드와 매칭된 노드가 없는 경우, x 노드와 매칭
+        if matched_Y[y] == 0:
+            matched_Y[y] = x
+            matched_X[x] = y
+            return True
+        # y 노드가 이미 매칭이 되어있는 경우, y 노드와 매칭되어 있는 노드가 다른 노드와 매칭이 가능한지 확인
+        elif not visited[matched_Y[y]] and dfs(matched_Y[y]):
+            # 다른 노드와 매칭이 가능한 경우, y 노드와 x 노드를 매칭
+            matched_Y[y] = x
+            matched_X[x] = y
+            return True
+    return False
 
-def find(x, y):
-    # 루트 노드가 아니라면, 루트 노드를 찾을 때까지 재귀적으로 호출
-    if parent[x][y] != (x, y):
-        parent[x][y] = find(parent[x][y][0], parent[x][y][1])
-    return parent[x][y]
+A, B = map(int, input().split())
+graph = [[] for _ in range(A+1)]
+matched_X = [0] * (A+1)
+matched_Y = [0] * (B+1)
 
+m = int(input())
+for _ in range(m):
+    a, b = map(int, input().split())
+    graph[a].append(b)
 
-def union(x1, y1, x2, y2):
-    a1, a2 = find(x1, y1)
-    b1, b2 = find(x2, y2)
-    if a1 < b1 or (a1 == b1 and a2 < b2):
-        parent[b1][b2] = (a1, a2)
-    else:
-        parent[a1][a2] = (b1, b2)
+cnt = 0
+for i in range(1, A+1):
+    if matched_X[i] == 0:
+        visited = [False] * (A+1)
+        if dfs(i):
+            cnt += 1
 
+print(cnt)
 
-def dfs(x, y):
-    visited[x][y] = 1
-    dir = ['U', 'D', 'L', 'R']
-    dx = [-1, 1, 0, 0]
-    dy = [0, 0, -1, 1]
-    idx = dir.index(table[x][y])
-    nx, ny = x+dx[idx], y+dy[idx]
-    if 0<=nx<n and 0<=ny<m and parent[nx][ny] != parent[x][y]:
-        union(x, y, nx, ny)
-        dfs(nx, ny)
+# 거의 이분그래프 추가 매칭
 
-
-n, m = map(int, input().split())
-table = [list(sys.stdin.readline().rstrip()) for _ in range(n)]
-
-# parent 를 자기자신으로 설정
-parent = [[0] * m for _ in range(n)]
-for i in range(n):
-    for j in range(m):
-        parent[i][j] = (i, j)
-
-visited = [[0] * m for _ in range(n)]
-for i in range(n):
-    for j in range(m):
-        if not visited[i][j]:
-            dfs(i, j)
-
-
-
-res = set()
-# print(parent)
-for i in range(n):
-    for j in range(m):
-        find(i, j)
-        if table[i][j] not in res:
-            res.add(parent[i][j])
-
-print(len(res))

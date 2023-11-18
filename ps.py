@@ -1,30 +1,28 @@
-# 9663
 import sys
 sys.setrecursionlimit(10**7)
-n = int(input())
+input = sys.stdin.readline
 
-ans = 0
-row = [0] * n
+A, B = map(int, input().split())
+graph = [[] for _ in range(A + 1)]
 
-def is_promising(x):
-    for i in range(x):
-        if row[x] == row[i] or abs(row[x] - row[i]) == abs(x - i):
-            return False
-    
-    return True
+m = int(input())
+for _ in range(m):
+    a, b = map(int, input().split())
+    graph[a].append(b)
 
-def n_queens(x):
-    global ans
-    if x == n:
-        ans += 1
-        return
+if (A * B) % 2 == 0:
+    print((A//2 + B//2))
+    exit()
 
-    else:
+else:
+    flag = 0
+    for a in range(1, A+1, 2):
+        for b in graph[a]:
+            if b%2 == 1:
+                flag = 1
+                break
 
-        for i in range(n):
-            # [x, i]에 퀸을 놓겠다.
-            row[x] = i
-            if is_promising(x):
-                n_queens(x+1)
-n_queens(0)
-print(ans)
+if flag:
+    print((A+B) // 2)
+else:
+    print((A+B)//2 - 1)
