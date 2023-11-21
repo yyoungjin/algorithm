@@ -1,31 +1,36 @@
-#6086
+#### 에드몬드카프 알고리즘
 import sys
 sys.setrecursionlimit(10**7)
+input = sys.stdin.readline
 from collections import deque
 
-n = 60
+N, p = map(int, input().split())
+n = N*2
 
 # graph, capacity, flow
 graph = [[] for _ in range(n+1)]
 capacity = [[0] * (n+1) for _ in range(n+1)]
 flow = [[0] * (n+1) for _ in range(n+1)]
 
-# graph update u -> v
-for _ in range(int(input())):
-    u, v, c = map(str, sys.stdin.readline().rstrip().split())
-    u, v, c = ord(u) - 64, ord(v) - 64, int(c)
-    # 이미 존재하는 간선인지
-    if capacity[u][v] > 0:
-        capacity[u][v] += c
-        capacity[v][u] += c
-        continue
+# graph update _u -> v
+for _ in range(p):
+    u, v = map(int, input().split())
+    _u = u + N
+    _v = v + N
+    graph[_u].append(v)
+    graph[v].append(_u) # 음수 유량 고려
+    capacity[_u][v] = 1
 
-    # 정방향
-    graph[u].append(v)
-    graph[v].append(u) # 음수 유량 고려
-    capacity[u][v] = c
-    capacity[v][u] = c
+    graph[_v].append(u)
+    graph[u].append(_v)
+    capacity[_v][u] = 1
 
+# u -> _u
+for u in range(1, N+1):
+    _u = u + N
+    graph[u].append(_u)
+    graph[_u].append(u)
+    capacity[u][_u] = 1
 
 def bfs_path(source, sink, visited): # source부터 sink까지 흘릴 수 있는 추가 유량이 있는지, 있다면 그 경로를 visited에 저장
     q = deque()
@@ -52,25 +57,16 @@ def edmonds_karp(source, sink):
         if not bfs_path(source, sink, visited): # path 가 없다면 업데이트 종료
             break
         
-        ## min_flow 찾는 과정
-        min_flow = 1e9
-        j = sink
-        while j != source:
-            i = visited[j]
-            leftover_flow = capacity[i][j] - flow[i][j]
-            min_flow = min(min_flow, leftover_flow)
-            j = i
-        
         # 위에서 찾은 min_flow를 flow에 업데이트
         j = sink
         while j != source:
             i = visited[j]
-            flow[i][j] += min_flow
-            flow[j][i] -= min_flow
+            flow[i][j] += 1
+            flow[j][i] -= 1
             j = i
 
-        ans += min_flow
+        ans += 1
 
     return ans
 
-print(edmonds_karp(1, 26))
+print(edmonds_karp(1+N, 2))
