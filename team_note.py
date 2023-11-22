@@ -130,3 +130,28 @@ def edmonds_karp(source, sink):
         ans += min_flow
 
     return ans
+
+
+#### 다익스트라
+n, m = map(int, input().split())
+INF = 1e9
+graph = [[] for _ in range(n+1)]
+distance = [INF] * (n+1)
+for _ in range(m):
+    u, v, w = map(int, input().split()) # u: 출발노드, v: 도착노드, w: 연결된 간선의 가중치 
+    graph[u].append((v, w))
+    
+start, end = map(int, input().split())
+import heapq
+def dijkstra(start):
+    q = []
+    heapq.heappush(q, (0, start)) # 가중치, 노드 형태로 들어간다.
+    distance[start] = 0
+    while q:
+        dist, now = heapq.heappop(q) 
+        if distance[now] < dist: # 이미 입력되어있는 값이 현재노드까지의 거리보다 작다면 이미 방문한 노드이다.
+            continue
+        for i in graph[now]: # 연결된 모든 노드 탐색
+            if dist+i[1] < distance[i[0]]: # 기존에 입력되어있는 값보다 크다면
+                distance[i[0]] = dist+i[1]
+                heapq.heappush(q, (dist+i[1], i[0]))
