@@ -1,41 +1,38 @@
-#20040
-#### 유니온파인드
-def find(x):
-    # 루트 노드가 아니라면, 루트 노드를 찾을 때까지 재귀적으로 호출
-    if parent[x] != x:
-        parent[x] = find(parent[x])
-    return parent[x]
-
-# 두 원소가 속한 집합을 합치기
-def union(a, b):
-    a = find(a)
-    b = find(b)
-    if a < b:
-        parent[b] = a
-    else:
-        parent[a] = b
-
+# 위상정렬
+from collections import deque
 import sys
 input = sys.stdin.readline
+v, m = map(int, input().split()) # v는 노드 수 e는 간선 수, m은 pd수
+indegree = [0] * (v+1)
+graph = [[] for i in range(v + 1)]
 
-# 노드의 개수와 간선(Union 연산)의 개수 입력 받기
-n, m = map(int, input().split())
-parent = [0] * n
+for _ in range(m):
+    tmp = list(map(int, input().split()))
+    for i in range(1, tmp[0]):
+        a, b = tmp[i], tmp[i+1]
+        graph[a].append(b)
+        indegree[b] += 1
 
-for i in range(n):
-    parent[i] = i
+def topology_sort():
+    result = []
+    q = deque()
+    for i in range(1, v+1):
+        if indegree[i] == 0:
+            q.append(i)
+        
+    while q:
+        now = q.popleft()
+        result.append(now)
+        for i in graph[now]:
+            indegree[i] -= 1
+            if indegree[i] == 0:
+                q.append(i)
+    
+    return result
 
-# Union 연산을 각각 수행
-flag = 0
-for i in range(m):
-    a, b = map(int, input().split())
-    if flag:
-        continue
-    if find(a) == find(b):
-        flag = i+1
-    union(a, b)
-
-if flag:
-    print(flag)
-else:
+res = topology_sort()
+if len(res) < v:
     print(0)
+else:
+    for r in res:
+        print(r)

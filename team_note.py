@@ -140,7 +140,7 @@ distance = [INF] * (n+1)
 for _ in range(m):
     u, v, w = map(int, input().split()) # u: 출발노드, v: 도착노드, w: 연결된 간선의 가중치 
     graph[u].append((v, w))
-    
+
 start, end = map(int, input().split())
 import heapq
 def dijkstra(start):
@@ -155,3 +155,32 @@ def dijkstra(start):
             if dist+i[1] < distance[i[0]]: # 기존에 입력되어있는 값보다 크다면
                 distance[i[0]] = dist+i[1]
                 heapq.heappush(q, (dist+i[1], i[0]))
+
+
+#### 위상정렬
+from collections import deque
+v, e = map(int, input().split())
+indegree = [0] * (v+1)
+graph = [[] for i in range(v + 1)]
+
+for _ in range(e):
+    a, b = map(int, input().split())
+    graph[a].append(b)
+    indegree[b] += 1
+
+def topology_sort():
+    result = []
+    q = deque()
+    for i in range(1, v+1):
+        if indegree[i] == 0:
+            q.append(i)
+        
+    while q:
+        now = q.popleft()
+        result.append(now)
+        for i in graph[now]:
+            indegree[i] -= 1
+            if indegree[i] == 0:
+                q.append(i)
+    
+    return result
