@@ -1,28 +1,38 @@
+# 27651
 import sys
-sys.setrecursionlimit(10**7)
 input = sys.stdin.readline
 
-A, B = map(int, input().split())
-graph = [[] for _ in range(A + 1)]
+n = int(input())
+arr = list(map(int, input().split()))
 
-m = int(input())
-for _ in range(m):
-    a, b = map(int, input().split())
-    graph[a].append(b)
+tmp = 0
+sum_arr = []
+for i in range(n):
+    tmp += arr[i]
+    sum_arr.append(tmp)
 
-if (A * B) % 2 == 0:
-    print((A//2 + B//2))
-    exit()
 
-else:
-    flag = 0
-    for a in range(1, A+1, 2):
-        for b in graph[a]:
-            if b%2 == 1:
-                flag = 1
-                break
+def part_sum(a, b):
+    if a == 0:
+        return sum_arr[b]
+    return sum_arr[b] - sum_arr[a-1]
 
-if flag:
-    print((A+B) // 2)
-else:
-    print((A+B)//2 - 1)
+
+res = 0
+p = n-1
+ep = 2
+for mp in range(1, n-1):
+    head = sum_arr[mp-1]
+    
+    while head >= part_sum(p, n-1):
+        p -= 1
+
+    while part_sum(mp, ep-1) <= part_sum(ep, n-1):
+        ep += 1
+
+    if ep <= p and ep < n:
+        res += (p - ep + 1)
+    else: 
+        break
+
+print(res)
