@@ -1,20 +1,26 @@
-# 2003
+# 1806
 import sys
 input = sys.stdin.readline
 
-n, m = map(int, input().split())
+n, s = map(int, input().split())
 arr = list(map(int, input().split()))
+
+INF = 1e5
 
 ep = 0
 num = arr[0]
-count = 0
+size = INF
 for sp in range(n):
-    while num < m and ep < n-1:
+    while num < s and ep < n-1:
         ep += 1
         num += arr[ep]
-    if num == m:
-        count += 1
 
+    if num >= s:
+        size = min(size, (ep - sp + 1))
+    
     num -= arr[sp]
 
-print(count)
+if size == INF:
+    print(0)
+else:
+    print(size)
