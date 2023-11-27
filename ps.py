@@ -1,23 +1,30 @@
-# 1253
-
 import sys
-input = sys.stdin.readline
 
-n = int(input())
-arr = list(map(int, input().split()))
-arr.sort()
+def palindrome(s, res):
+    sp, ep = 0, len(s)-1
+    while sp < ep:
+        if s[sp] == s[ep]:
+            sp += 1
+            ep -= 1
+        elif not res:
+            if palindrome(s[sp+1:ep+1], 1) == 0:
+                return 1
+            elif palindrome(s[sp:ep], 1) == 0:
+                return 1
+            else:
+                return 2
 
-ans = 0
+        else:
+            return 2
+        
+    return 0
 
-for i in range(n):
-    tmp = arr[:i] + arr[i + 1:]
-    left, right = 0, len(tmp) - 1
-    while left < right:
-        t = tmp[left] + tmp[right]
-        if t == arr[i]:
-            ans += 1
-            break
-        if t < arr[i]: left += 1
-        else: right -= 1 
 
-print(ans)
+n = int(sys.stdin.readline())
+res = []
+for _ in range(n):
+    s = list(sys.stdin.readline().rstrip())
+    res.append(palindrome(s, 0))
+
+for i in res:
+    print(i)
