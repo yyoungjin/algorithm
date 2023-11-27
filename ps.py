@@ -1,37 +1,23 @@
-# 1644
-def sieve_of_eratosthenes(n):
-    primes = [True] * (n+1)  # 0부터 n까지의 모든 수를 포함하는 리스트 생성, 초기값은 모두 소수로 가정
+# 1253
 
-    primes[0], primes[1] = False, False  # 0과 1은 소수가 아니므로 False로 설정
-
-    p = 2
-    while p * p <= n:
-        if primes[p] == True:  # p가 소수인 경우
-            for i in range(p * p, n + 1, p):
-                primes[i] = False  # p의 배수들을 모두 소수가 아닌 것으로 표시
-
-        p += 1
-
-    prime_numbers = [num for num in range(n+1) if primes[num]]  # 소수들을 리스트에 저장
-    return prime_numbers
+import sys
+input = sys.stdin.readline
 
 n = int(input())
-arr = sieve_of_eratosthenes(n)
+arr = list(map(int, input().split()))
+arr.sort()
 
-ep = 0
-if not arr:
-    print(0)
-    exit()
-num = arr[0]
-count = 0
-for sp in range(len(arr)):
-    while num < n and ep < (len(arr)-1):
-        ep += 1
-        num += arr[ep]
-    
-    if num == n:
-        count += 1
-    
-    num -= arr[sp]
+ans = 0
 
-print(count)
+for i in range(n):
+    tmp = arr[:i] + arr[i + 1:]
+    left, right = 0, len(tmp) - 1
+    while left < right:
+        t = tmp[left] + tmp[right]
+        if t == arr[i]:
+            ans += 1
+            break
+        if t < arr[i]: left += 1
+        else: right -= 1 
+
+print(ans)
